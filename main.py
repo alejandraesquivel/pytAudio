@@ -2,6 +2,7 @@
 from tkinter import *
 from tkinter import filedialog
 import os
+from tkinter import ttk
 
 
 # Here, we are creating our class, Window, and inheriting from the Frame
@@ -29,8 +30,20 @@ class Window(Frame):
         # allowing the widget to take the full space of the root window
         self.pack(fill=BOTH, expand=1)
         self.create_menu()
+        self.create_tabs()
 
-
+    def create_tabs(self):
+        nb = ttk.Notebook(self)
+        nb.grid(row=1, column=0, columnspan=50, rowspan=49, sticky='NESW')
+         
+        # Adds tab 1 of the notebook
+        page1 = ttk.Frame(nb)
+        nb.add(page1, text='Tab1')
+         
+        # Adds tab 2 of the notebook
+        page2 = ttk.Frame(nb)
+        nb.add(page2, text='Tab2')
+    
     def client_exit(self):
         exit()
     def dialog(self):
