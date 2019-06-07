@@ -1,5 +1,7 @@
 # Simple enough, just import everything from tkinter.
 from tkinter import *
+from tkinter import filedialog
+import os
 
 
 # Here, we are creating our class, Window, and inheriting from the Frame
@@ -17,10 +19,11 @@ class Window(Frame):
         # with that, we want to then run init_window, which doesn't yet exist
         self.init_window()
 
+
     # Creation of init_window
     def init_window(self):
         # changing the title of our master widget
-        self.master.title("GUI")
+        self.master.title("GUI para Procesamiento de Senales")
         # self.minsize(640,400)
 
         # allowing the widget to take the full space of the root window
@@ -30,6 +33,33 @@ class Window(Frame):
 
     def client_exit(self):
         exit()
+    def dialog(self):
+        my_filetypes = [('text files', '.wav')]
+
+        # Ask the user to select a folder.
+        answer_1 = filedialog.askdirectory(parent=self,
+                                         initialdir=os.getcwd(),
+                                         title="Please select a folder:")
+
+        # Ask the user to select a single file name.
+        answer_2= filedialog.askopenfilename(parent=self,
+                                            initialdir=os.getcwd(),
+                                            title="Please select a file:",
+                                            filetypes=my_filetypes)
+
+        # Ask the user to select a one or more file names.
+        answer_3 = filedialog.askopenfilenames(parent=self,
+                                             initialdir=os.getcwd(),
+                                             title="Please select one or more files:",
+                                             filetypes=my_filetypes)
+
+        # Ask the user to select a single file name for saving.
+        answer_4 = filedialog.asksaveasfilename(parent=self,
+                                              initialdir=os.getcwd(),
+                                              title="Please select a file name for saving:",
+                                              filetypes=my_filetypes)
+        return answer_2[0],answer_3[0]
+
     def create_menu(self):
         # creating a menu instance
         menubar = Menu(self.master)
@@ -42,7 +72,7 @@ class Window(Frame):
         # command it runs on event is client_exit
 
         menubar.add_cascade(label="File", menu=file_menu)
-        file_menu.add_command(label="Open File",command=self.client_exit)
+        file_menu.add_command(label="Open File",command=self.dialog)
         file_menu.add_command(label="Exit", command=self.client_exit)
 
         # added "file" to our menu
