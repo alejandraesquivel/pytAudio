@@ -1,16 +1,14 @@
 # Simple enough, just import everything from tkinter.
-from tkinter import *
+from PIL import Image as ImagePIL, ImageTk as itk
+import matplotlib.pyplot as plt
 from tkinter import filedialog
-import os
 from tkinter import ttk, simpledialog
-import subprocess
-
-import matplotlib.pyplot as mpl
+import librosa.display
+from tkinter import *
 import numpy as np
-import sys
-
-import matplotlib.backends.tkagg as tkagg
-from matplotlib.backends.backend_agg import FigureCanvasAgg
+import subprocess
+import librosa
+import os
 
 # Here, we are creating our class, Window, and inheriting from the Frame
 # class. Frame is a class from the tkinter module. (see Lib/tkinter/__init__)
@@ -24,7 +22,7 @@ class Window(Frame):
         # reference to the master widget, which is the tk window
         self.master = master
 
-        self.respuesta=[]
+        self.respuesta = []
 
         # with that, we want to then run init_window, which doesn't yet exist
         self.init_window()
@@ -41,10 +39,14 @@ class Window(Frame):
         self.create_menu()
         self.create_tabs()
 
+
+
+
     def create_tabs(self):
         nb = ttk.Notebook(self)
-        nb.grid(row=1, column=0, columnspan=400, rowspan=300, sticky='NESW')
-         
+
+        nb.grid(row=1, column=1, columnspan=400, rowspan=300, sticky='NESW')
+
         # Adds tab 1 of the notebook
         page1 = ttk.Frame(nb)
         nb.add(page1, text='ONE SIGNAL')
@@ -53,6 +55,8 @@ class Window(Frame):
         B.pack(side='left',fill='y')
         Bd= Button(page1, text ="Graph",command=self.playAudio1)
         Bd.pack(side='right',fill='y')
+        self.create_canvas(page1)
+
 
         # Adds tab 2 of the notebook
         page2 = ttk.Frame(nb)
@@ -66,6 +70,7 @@ class Window(Frame):
         page3 = ttk.Frame(nb)
         nb.add(page3, text='FILTERS')
         nb.pack(expand=50,fill='both')
+
         B3 = Button(page3, text ="SELECT_CHANNEL",command=self.ask)
         B3.pack(side='left',fill='y')
     
@@ -73,16 +78,22 @@ class Window(Frame):
         #0 es Izquierdo y 1 es Derecho
         a=simpledialog.askinteger('Select the Channel', 'Select the Channel, 0 is for Left and 1 for Right')
 
-    
+
+
+    def create_canvas(self,frame):
+            canvas = Canvas(frame,width=600, height=100)
+            canvas.pack(side=LEFT,fill='y')
+            img = ImagePIL.open('audio.png')
+            canvas.image=itk.PhotoImage(img)
+            canvas.create_image(0,0, anchor='nw', image=canvas.image)
+
+
+
     def client_exit(self):
         exit()
+
     def dialog(self):
         my_filetypes = [('text files', '.wav')]
-
-        # Ask the user to select a folder.
-        # answer_1 = filedialog.askdirectory(parent=self,
-        #                                  initialdir=os.getcwd(),
-        #                                  title="Please select a folder:")
 
         # Ask the user to select a single file name.
         answer_2= filedialog.askopenfilename(parent=self,
@@ -96,14 +107,9 @@ class Window(Frame):
                                              title="Please select one or more files:",
                                              filetypes=my_filetypes)
 
-        # Ask the user to select a single file name for saving.
-        # answer_4 = filedialog.asksaveasfilename(parent=self,
-        #                                       initialdir=os.getcwd(),
-        #                                       title="Please select a file name for saving:",
-        #                                       filetypes=my_filetypes)
         self.respuesta.append(answer_2)
         self.respuesta.append(answer_3)
-    
+
     def playAudio1(self):
         print('respuesta')
         p=self.respuesta[0]
@@ -131,15 +137,9 @@ class Window(Frame):
         file_menu.add_command(label="Exit", command=self.client_exit)
 
         # added "file" to our menu
-        # create the file object)
-        edit = Menu(menubar, tearoff= 0)
 
-        # adds a command to the menu option, calling it exit, and the
-        # command it runs on event is client_exit
-        edit.add_command(label="Undo")
-
-        # added "file" to our menu
-        menubar.add_cascade(label="Edit", menu=edit)
+        # play = Menu(menubar)
+        # menubar.add_cascade(label="Reproducir",menu=play)
 
         help_menu = Menu(menubar,tearoff = 0 )
         menubar.add_cascade(label="Help",menu=help_menu)
@@ -151,6 +151,18 @@ class Window(Frame):
 
 
 
+
+    def play_audio(self):
+        subprocess.call(['ffplay', '-nodisp', '-autoexit', self.respuesta[0]])
+
+    def plotAudio(self):
+        audio = self.respuesta[0]
+        y, Fs = librosa.load(audio, mono=False)
+        plt.figure(figsize=(5,5))
+        librosa.display.waveplot(y, sr=Fs)
+        plt.savefig('audio.png')
+
+    #def menu(self):
 
 # root window created. Here, that would be the only window, but
 # you can later have windows within windows.
