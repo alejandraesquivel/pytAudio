@@ -3,7 +3,7 @@ from tkinter import *
 from tkinter import filedialog
 import os
 from tkinter import ttk
-
+import subprocess
 
 # Here, we are creating our class, Window, and inheriting from the Frame
 # class. Frame is a class from the tkinter module. (see Lib/tkinter/__init__)
@@ -16,6 +16,8 @@ class Window(Frame):
 
         # reference to the master widget, which is the tk window
         self.master = master
+
+        self.respuesta=[]
 
         # with that, we want to then run init_window, which doesn't yet exist
         self.init_window()
@@ -39,12 +41,15 @@ class Window(Frame):
         # Adds tab 1 of the notebook
         page1 = ttk.Frame(nb)
         nb.add(page1, text='Tab1')
+        B = Button(page1, text ="Reproducir",command=self.playAudio)
         nb.pack(expand=50,fill='both')
-         
+        B.pack(side='left',fill='y')
+
         # Adds tab 2 of the notebook
         page2 = ttk.Frame(nb)
         nb.add(page2, text='Tab2')
         nb.pack(expand=50,fill='both')
+
     
     def client_exit(self):
         exit()
@@ -73,7 +78,13 @@ class Window(Frame):
         #                                       initialdir=os.getcwd(),
         #                                       title="Please select a file name for saving:",
         #                                       filetypes=my_filetypes)
-        return answer_2[0],answer_3[0]
+        self.respuesta.append(answer_2)
+        self.respuesta.append(answer_3)
+    
+    def playAudio(self):
+        print('respuesta')
+        p=self.respuesta[0]
+        subprocess.call(['ffplay','-nodisp',p])
 
     def create_menu(self):
         # creating a menu instance
@@ -91,9 +102,6 @@ class Window(Frame):
         file_menu.add_command(label="Exit", command=self.client_exit)
 
         # added "file" to our menu
-
-
-
         # create the file object)
         edit = Menu(menubar, tearoff= 0)
 
@@ -103,11 +111,11 @@ class Window(Frame):
 
         # added "file" to our menu
         menubar.add_cascade(label="Edit", menu=edit)
-        play = Menu(menubar)
-        menubar.add_cascade(label="Reproducir",menu=play)
 
         help_menu = Menu(menubar,tearoff = 0 )
         menubar.add_cascade(label="Ayuda",menu=help_menu)
+
+
 
 # root window created. Here, that would be the only window, but
 # you can later have windows within windows.
@@ -117,6 +125,8 @@ root.geometry("900x600")
 
 # creation of an instance
 app = Window(root)
+
+
 
 # mainloop
 root.mainloop()
