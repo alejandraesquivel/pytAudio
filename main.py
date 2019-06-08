@@ -2,8 +2,15 @@
 from tkinter import *
 from tkinter import filedialog
 import os
-from tkinter import ttk
+from tkinter import ttk, simpledialog
 import subprocess
+
+import matplotlib.pyplot as mpl
+import numpy as np
+import sys
+
+import matplotlib.backends.tkagg as tkagg
+from matplotlib.backends.backend_agg import FigureCanvasAgg
 
 # Here, we are creating our class, Window, and inheriting from the Frame
 # class. Frame is a class from the tkinter module. (see Lib/tkinter/__init__)
@@ -44,6 +51,8 @@ class Window(Frame):
         nb.pack(expand=50,fill='both')
         B = Button(page1, text ="PLAY",command=self.playAudio1)
         B.pack(side='left',fill='y')
+        Bd= Button(page1, text ="Graph",command=self.playAudio1)
+        Bd.pack(side='right',fill='y')
 
         # Adds tab 2 of the notebook
         page2 = ttk.Frame(nb)
@@ -57,6 +66,13 @@ class Window(Frame):
         page3 = ttk.Frame(nb)
         nb.add(page3, text='FILTERS')
         nb.pack(expand=50,fill='both')
+        B3 = Button(page3, text ="SELECT_CHANNEL",command=self.ask)
+        B3.pack(side='left',fill='y')
+    
+    def ask(self):
+        #0 es Izquierdo y 1 es Derecho
+        a=simpledialog.askinteger('Select the Channel', 'Select the Channel, 0 is for Left and 1 for Right')
+
     
     def client_exit(self):
         exit()
@@ -96,7 +112,7 @@ class Window(Frame):
     def playAudio2(self):
         print('respuesta',self.respuesta[1])
         p=self.respuesta[1]
-        
+
         subprocess.call(['ffplay','-nodisp','-autoexit',p])
 
     def create_menu(self):
@@ -127,6 +143,12 @@ class Window(Frame):
 
         help_menu = Menu(menubar,tearoff = 0 )
         menubar.add_cascade(label="Help",menu=help_menu)
+
+
+        # Add more elements to the canvas, potentially on top of the figure
+       # self.create_text(150, 50, text="Grafica en el Dominio de la Frecuencia", anchor="s")
+        
+
 
 
 
