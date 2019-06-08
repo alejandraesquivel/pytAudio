@@ -42,16 +42,16 @@ class Window(Frame):
         page1 = ttk.Frame(nb)
         nb.add(page1, text='ONE SIGNAL')
         nb.pack(expand=50,fill='both')
-        B = Button(page1, text ="PLAY",command=self.playAudio)
+        B = Button(page1, text ="PLAY",command=self.playAudio1)
         B.pack(side='left',fill='y')
 
         # Adds tab 2 of the notebook
         page2 = ttk.Frame(nb)
         nb.add(page2, text='TWO SIGNAL')
         nb.pack(expand=50,fill='both')
-        B1 = Button(page2, text ="PLAY AUDIO 1",command=self.playAudio)
+        B1 = Button(page2, text ="PLAY AUDIO 1",command=self.playAudio1)
         B1.pack(side='left',fill='y')
-        B2 = Button(page2, text ="PLAY AUDIO 2",command=self.playAudio)
+        B2 = Button(page2, text ="PLAY AUDIO 2",command=self.playAudio2)
         B2.pack(side='right',fill='y')
 
         page3 = ttk.Frame(nb)
@@ -88,9 +88,15 @@ class Window(Frame):
         self.respuesta.append(answer_2)
         self.respuesta.append(answer_3)
     
-    def playAudio(self):
+    def playAudio1(self):
         print('respuesta')
         p=self.respuesta[0]
+        subprocess.call(['ffplay','-nodisp','-autoexit',p])
+
+    def playAudio2(self):
+        print('respuesta',self.respuesta[1])
+        p=self.respuesta[1]
+        
         subprocess.call(['ffplay','-nodisp','-autoexit',p])
 
     def create_menu(self):
