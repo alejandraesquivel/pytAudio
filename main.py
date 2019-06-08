@@ -49,19 +49,17 @@ class Window(Frame):
         self.create_tabs()
 
 
-
-
     def create_tabs(self):
         nb = ttk.Notebook(self)
         nb.grid(row=2, column=2, columnspan=400, rowspan=300, sticky='NESW')
 
-        # Adds tab 1 of the notebook contaminacio puro, conta gaussiano,submuestreo fs ,modula,amplitud 
+        # Adds tab 1 of the notebook contaminacio puro, conta gaussiano,submuestreo fs ,modula,amplitud
         page1 = ttk.Frame(nb)
         nb.add(page1, text='ONE SIGNAL')
         nb.pack(expand=50,fill='both')
         B = Button(page1, text ="PLAY",command=self.playAudio1,bg="pale turquoise", fg="black")
         B.pack(side='left',fill='y')
-        Bd= Button(page1, text ="Graph",command=self.playAudio1,bg="pale turquoise", fg="black")
+        Bd= Button(page1, text ="GRAPH",command=self.audio,bg="pale turquoise", fg="black")
         Bd.pack(side='right',fill='y')
         self.create_canvas(page1)
         B8 = Button(page1, text ="Pure Tone Noise",width=15, height=1,bg="linen", fg="black")
@@ -75,7 +73,6 @@ class Window(Frame):
         B10.place(x=530,y=3)
         B11 = Button(page1, text ="Amplify", width=15, bg="linen", fg="black")
         B11.place(x=660,y=3)
-
 
         # Adds tab 2 of the notebook
         page2 = ttk.Frame(nb)
@@ -101,7 +98,7 @@ class Window(Frame):
         B13.place(x=390,y=550)
         B14 = Button(page2, text ="Multiplication", width=25, bg="lavender", fg="black")
         B14.place(x=600,y=550)
-       
+
 
         #adds tab 3 of the notebook
         page3 = ttk.Frame(nb)
@@ -118,7 +115,7 @@ class Window(Frame):
         self.ope_fir()
         self.ope_iir()
 
-    
+
     def ask(self):
         #0 es Izquierdo y 1 es Derecho
         a=simpledialog.askinteger('Select the Channel', 'Select the Channel, 0 is for Left and 1 for Right')
@@ -177,13 +174,11 @@ class Window(Frame):
 
 
     def create_canvas(self,frame):
-            canvas = Canvas(frame,width=600, height=100)
-            canvas.pack(side=LEFT,fill='y')
-            img = ImagePIL.open('audio.png')
-            canvas.image=itk.PhotoImage(img)
-            canvas.create_image(0,0, anchor='nw', image=canvas.image)
-
-
+        canvas = Canvas(frame,width=50, height=50)
+        canvas.pack(side=LEFT,fill='y')
+        img = ImagePIL.open('audio.png')
+        canvas.image=itk.PhotoImage(img)
+        canvas.create_image(0,0, anchor='nw', image=canvas.image)
 
     def client_exit(self):
         exit()
@@ -205,17 +200,6 @@ class Window(Frame):
 
         self.respuesta.append(answer_2)
         self.respuesta.append(answer_3)
-
-    def playAudio1(self):
-        print('respuesta')
-        p=self.respuesta[0]
-        subprocess.call(['ffplay','-nodisp','-autoexit',p])
-
-    def playAudio2(self):
-        print('respuesta',self.respuesta[1])
-        p=self.respuesta[1]
-
-        subprocess.call(['ffplay','-nodisp','-autoexit',p])
 
     def create_menu(self):
         # creating a menu instance
@@ -240,31 +224,103 @@ class Window(Frame):
         help_menu = Menu(menubar,tearoff = 0 )
         menubar.add_cascade(label="Help",menu=help_menu)
 
-
-        # Add more elements to the canvas, potentially on top of the figure
-       # self.create_text(150, 50, text="Grafica en el Dominio de la Frecuencia", anchor="s")
-        
-
-
-
-
-    def play_audio(self):
-        subprocess.call(['ffplay', '-nodisp', '-autoexit', self.respuesta[0]])
-
-    def plotAudio(self):
+    # Funciones Basicas para cargar y dibujar
+    def loadAudio(self):
         audio = self.respuesta[0]
         y, Fs = librosa.load(audio, mono=False)
-        plt.figure(figsize=(5,5))
+        return [y,Fs]
+
+    def plotAudio(self,y,Fs):
+        plt.figure(figsize=(14,5))
         librosa.display.waveplot(y, sr=Fs)
-        plt.savefig('audio.png')
+        plt.show()
 
-    #def menu(self):
+    # Graficas para una sola señal
+    def audio(self): #Audio Original
+        audio = self.loadAudio()
+        self.plotAudio(audio[0],audio[1])
 
-# root window created. Here, that would be the only window, but
-# you can later have windows within windows.
+    def conPuroAudio(self): #Audio con Ruido Puro
+        audio = self.loadAudio()
+        N = len(audio[0])
+        f = 5
+        x = np.arange(N)
+        noise = np.sin(2 * np.pi * f)
+        suma = y + noise
+        self.plotAudio(suma,audio[1])
+
+    def conGaussAudio(self): #Audio con Gaussiano
+        audio = self.loadAudio()
+        noise = np.random.normal(0,1,audio[0].shape)
+        gauss = audio[0] + noise
+        self.plotAudio(gauss,audio[1])
+
+    def submuestroAudio(Fs,self): #Audio con Submuestreo
+        audio = self.loadAudio()
+        Fsub = Fs #pasar submuestro
+        self.plotAudio(audio[0], Fs)
+
+    def amplificarAudio(A,self): #Audio Amplificado
+        name = 'amplificar.wav'
+        audio = self.loadAudio()
+        amplificar = A * audio[0]
+        writeAudio(name,amplificar,audio[1])
+
+    def modulacionAudio(self): #Audio Modulacion
+        audio = self.loadAudio()
+        Fs = 3 * audio[1]
+        name = 'modulacion.wav'
+        n = np.arange(len(x))
+        mod = (1 + 0.5 * audio[0]) * np.cos(2 *  np.pi * f * n)
+        self.plotAudio(mod, Fs)
+        writeAudio(name,mod,Fs)
+
+    # Funciones para dos señales
+    def playAudio1(self):
+        subprocess.call(['ffplay', '-nodisp', '-autoexit', self.respuesta[0]])
+
+    def playAudio2(self):
+        subprocess.call(['ffplay', '-nodisp', '-autoexit', self.respuesta[1]])
+
+    def audio2(self):
+        audio = self.respuesta[1]
+        y, Fs = librosa.load(audio, mono=False)
+        return [y,Fs]
+
+    def suma(self): #Suma dos señales mono
+        audio = self.loadAudio()
+        audio2 = self.audio2()
+        N = len(audio[0])
+        channel2 = audio2[0][:N]
+        name = 'suma.wav'
+        suma = audio[0] + channel2
+        #writeAudio(name,suma,Fs1)
+        plotAudio(suma, audio[1])
+
+    def resta(self): #Resta de dos señales mono
+        audio = self.loadAudio()
+        audio2 = self.audio2()
+        name = 'resta.wav'
+        N = len(audio[0])
+        channel2 = audio2[0][:N]
+        resta = audio[0] - channel2
+        writeAudio(name,resta,Fs1)
+        plotAudio(resta, audio[1])
+
+    def multiplicacion(self): #Multiplicación de dos señales mono
+        audio = self.loadAudio()
+        audio2 = self.audio2()
+        name = 'resta.wav'
+        N = len(audio[0])
+        channel2 = audio2[0][:N]
+        name = 'multiplicacion.wav'
+        multiplicacion = audio[0] * channel2
+        writeAudio(name,multiplicacion,Fs1)
+        plotAudio(multiplicacion, audio[1])
+
 root = Tk()
 
-root.geometry("900x600")
+root.geometry("700x600")
 
 # creation of an instance
 app = Window(root)
