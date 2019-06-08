@@ -34,15 +34,17 @@ class Window(Frame):
 
     def create_tabs(self):
         nb = ttk.Notebook(self)
-        nb.grid(row=1, column=0, columnspan=50, rowspan=49, sticky='NESW')
+        nb.grid(row=1, column=0, columnspan=400, rowspan=300, sticky='NESW')
          
         # Adds tab 1 of the notebook
         page1 = ttk.Frame(nb)
         nb.add(page1, text='Tab1')
+        nb.pack(expand=50,fill='both')
          
         # Adds tab 2 of the notebook
         page2 = ttk.Frame(nb)
         nb.add(page2, text='Tab2')
+        nb.pack(expand=50,fill='both')
     
     def client_exit(self):
         exit()
@@ -67,10 +69,10 @@ class Window(Frame):
                                              filetypes=my_filetypes)
 
         # Ask the user to select a single file name for saving.
-        answer_4 = filedialog.asksaveasfilename(parent=self,
-                                              initialdir=os.getcwd(),
-                                              title="Please select a file name for saving:",
-                                              filetypes=my_filetypes)
+        # answer_4 = filedialog.asksaveasfilename(parent=self,
+        #                                       initialdir=os.getcwd(),
+        #                                       title="Please select a file name for saving:",
+        #                                       filetypes=my_filetypes)
         return answer_2[0],answer_3[0]
 
     def create_menu(self):
@@ -111,7 +113,7 @@ class Window(Frame):
 # you can later have windows within windows.
 root = Tk()
 
-root.geometry("400x300")
+root.geometry("900x600")
 
 # creation of an instance
 app = Window(root)
