@@ -26,7 +26,7 @@ class Window(Frame):
     # Creation of init_window
     def init_window(self):
         # changing the title of our master widget
-        self.master.title("GUI para Procesamiento de Senales")
+        self.master.title("GUI Signal Proccesor")
         # self.minsize(640,400)
 
         # allowing the widget to take the full space of the root window
@@ -40,16 +40,23 @@ class Window(Frame):
          
         # Adds tab 1 of the notebook
         page1 = ttk.Frame(nb)
-        nb.add(page1, text='Tab1')
-        B = Button(page1, text ="Reproducir",command=self.playAudio)
+        nb.add(page1, text='ONE SIGNAL')
         nb.pack(expand=50,fill='both')
+        B = Button(page1, text ="PLAY",command=self.playAudio)
         B.pack(side='left',fill='y')
 
         # Adds tab 2 of the notebook
         page2 = ttk.Frame(nb)
-        nb.add(page2, text='Tab2')
+        nb.add(page2, text='TWO SIGNAL')
         nb.pack(expand=50,fill='both')
+        B1 = Button(page2, text ="PLAY AUDIO 1",command=self.playAudio)
+        B1.pack(side='left',fill='y')
+        B2 = Button(page2, text ="PLAY AUDIO 2",command=self.playAudio)
+        B2.pack(side='right',fill='y')
 
+        page3 = ttk.Frame(nb)
+        nb.add(page3, text='FILTERS')
+        nb.pack(expand=50,fill='both')
     
     def client_exit(self):
         exit()
@@ -57,9 +64,9 @@ class Window(Frame):
         my_filetypes = [('text files', '.wav')]
 
         # Ask the user to select a folder.
-        answer_1 = filedialog.askdirectory(parent=self,
-                                         initialdir=os.getcwd(),
-                                         title="Please select a folder:")
+        # answer_1 = filedialog.askdirectory(parent=self,
+        #                                  initialdir=os.getcwd(),
+        #                                  title="Please select a folder:")
 
         # Ask the user to select a single file name.
         answer_2= filedialog.askopenfilename(parent=self,
@@ -84,7 +91,7 @@ class Window(Frame):
     def playAudio(self):
         print('respuesta')
         p=self.respuesta[0]
-        subprocess.call(['ffplay','-nodisp',p])
+        subprocess.call(['ffplay','-nodisp','-autoexit',p])
 
     def create_menu(self):
         # creating a menu instance
@@ -113,7 +120,7 @@ class Window(Frame):
         menubar.add_cascade(label="Edit", menu=edit)
 
         help_menu = Menu(menubar,tearoff = 0 )
-        menubar.add_cascade(label="Ayuda",menu=help_menu)
+        menubar.add_cascade(label="Help",menu=help_menu)
 
 
 
