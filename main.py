@@ -9,8 +9,6 @@ import numpy as np
 import subprocess
 import librosa
 import os
-
-
 # Here, we are creating our class, Window, and inheriting from the Frame
 # class. Frame is a class from the tkinter module. (see Lib/tkinter/__init__)
 class Window(Frame):
@@ -32,7 +30,7 @@ class Window(Frame):
     # Creation of init_window
     def init_window(self):
         # changing the title of our master widget
-        self.master.title("GUI para Procesamiento de Senales")
+        self.master.title("GUI Signal Proccesor")
         # self.minsize(640,400)
 
         # allowing the widget to take the full space of the root window
@@ -45,19 +43,29 @@ class Window(Frame):
 
     def create_tabs(self):
         nb = ttk.Notebook(self)
+
         nb.grid(row=1, column=1, columnspan=400, rowspan=300, sticky='NESW')
 
         # Adds tab 1 of the notebook
         page1 = ttk.Frame(nb)
-        nb.add(page1, text='Tab1')
-        reproducir = Button(page1, text='Reproducir',command=self.play_audio).pack(side=LEFT,fill='y')
+        nb.add(page1, text='ONE SIGNAL')
+        reproducir = Button(page1, text='PLAY',command=self.play_audio).pack(side=LEFT,fill='y')
         self.create_canvas(page1)
         grafica = Button(page1, text='Graph',command=self.plotAudio).pack(side=LEFT,fill='y')
 
         # Adds tab 2 of the notebook
         page2 = ttk.Frame(nb)
-        nb.add(page2, text='Tab2')
+        nb.add(page2, text='TWO SIGNAL')
         nb.pack(expand=50,fill='both')
+        B1 = Button(page2, text ="PLAY AUDIO 1",command=self.playAudio1)
+        B1.pack(side='left',fill='y')
+        B2 = Button(page2, text ="PLAY AUDIO 2",command=self.playAudio2)
+        B2.pack(side='right',fill='y')
+
+        page3 = ttk.Frame(nb)
+        nb.add(page3, text='FILTERS')
+        nb.pack(expand=50,fill='both')
+
 
     def create_canvas(self,frame):
             canvas = Canvas(frame,width=600, height=100)
@@ -85,9 +93,18 @@ class Window(Frame):
                                              title="Please select one or more files:",
                                              filetypes=my_filetypes)
 
-
         self.respuesta.append(answer_2)
         self.respuesta.append(answer_3)
+
+    def playAudio1(self):
+        print('respuesta')
+        p=self.respuesta[0]
+        subprocess.call(['ffplay','-nodisp','-autoexit',p])
+
+    def playAudio2(self):
+        print('respuesta',self.respuesta[1])
+        p=self.respuesta[1]
+        subprocess.call(['ffplay','-nodisp','-autoexit',p])
 
     def create_menu(self):
         # creating a menu instance
@@ -106,19 +123,13 @@ class Window(Frame):
 
         # added "file" to our menu
 
-        # create the file object)
-        edit = Menu(menubar, tearoff= 0)
-
-        # adds a command to the menu option, calling it exit, and the
-        # command it runs on event is client_exit
-        edit.add_command(label="Undo")
-
-        # added "file" to our menu
-        menubar.add_cascade(label="Edit", menu=edit)
         # play = Menu(menubar)
         # menubar.add_cascade(label="Reproducir",menu=play)
+
         help_menu = Menu(menubar,tearoff = 0 )
-        menubar.add_cascade(label="Ayuda",menu=help_menu)
+        menubar.add_cascade(label="Help",menu=help_menu)
+
+
 
     def play_audio(self):
         subprocess.call(['ffplay', '-nodisp', '-autoexit', self.respuesta[0]])
@@ -140,6 +151,8 @@ root.geometry("900x600")
 
 # creation of an instance
 app = Window(root)
+
+
 
 # mainloop
 root.mainloop()
