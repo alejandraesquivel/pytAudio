@@ -25,7 +25,14 @@ class Window(Frame):
         self.respuesta = []
         self.canal=0
         self.frecuencias=[]
-
+        self.f_pbaja_fir=[]
+        self.f_altap_fir=[]
+        self.f_pbanda_fir=[]
+        self.f_rbanda_fir=[]
+        self.f_pbaja_iir=[]
+        self.f_altap_iir=[]
+        self.f_pbanda_iir=[]
+        self.f_rbanda_iir=[]
         # with that, we want to then run init_window, which doesn't yet exist
         self.init_window()
 
@@ -104,6 +111,12 @@ class Window(Frame):
         B3.pack(side='left',fill='y')
         B15 = Button(page3, text ="SELECT_5 Frecuencies to Noise",command=self.frec_noise, bg="pale turquoise", fg="black")
         B15.pack(side='right',fill='y')
+        B16 = Button(page3, text ="FIR",command=self.pedir_frec, bg="pale turquoise", fg="black")
+        B16.pack(side='top',fill='y')
+        B17 = Button(page3, text ="IIR",command=self.pedir_frec_iir, bg="pale turquoise", fg="black")
+        B17.pack(side='top',fill='y')
+        self.ope_fir()
+        self.ope_iir()
 
     
     def ask(self):
@@ -115,6 +128,53 @@ class Window(Frame):
         for i in range(5):
             a=simpledialog.askinteger('Frecuency to Noise', 'Put the Frecuency '+ str(i+1))
             self.frecuencias.append(a)
+
+    def ope_fir(self):
+        B1 = Button(self, text ="Low Pass FIR", bg="linen", fg="black")
+        B1.place(x=105,y=550)
+        B2 = Button(self, text ="High Pass FIR", bg="linen", fg="black")
+        B2.place(x=250,y=550)
+        B3 = Button(self, text ="Pass Band FIR", bg="linen", fg="black")
+        B3.place(x=430,y=550)
+        B4 = Button(self, text ="Split Band FIR", bg="linen", fg="black")
+        B4.place(x=600,y=550)
+
+    def ope_iir(self):
+        B1 = Button(self, text ="Low Pass IIR", bg="linen", fg="black")
+        B1.place(x=105,y=450)
+        B2 = Button(self, text ="High Pass IIR", bg="linen", fg="black")
+        B2.place(x=250,y=450)
+        B3 = Button(self, text ="Pass Band IIR", bg="linen", fg="black")
+        B3.place(x=430,y=450)
+        B4 = Button(self, text ="Split Band IIR", bg="linen", fg="black")
+        B4.place(x=600,y=450)
+
+    def pedir_frec(self):
+        a=0
+        for i in range(2):
+            if a==0:
+                x=simpledialog.askinteger('Frecuency to FIR', 'Put the Maximum Frecuency')
+            else:
+                x=simpledialog.askinteger('Frecuency to FIR', 'Put the Minimum Frecuency')
+            a=1
+            self.f_pbaja_fir.append(x)
+            self.f_altap_fir.append(x)
+            self.f_pbanda_fir.append(x)
+            self.f_rbanda_fir.append(x)
+
+    def pedir_frec_iir(self):
+        a=0
+        for i in range(2):
+            if a==0:
+                x=simpledialog.askinteger('Frecuency to IIR', 'Put the Maximum Frecuency')
+            else:
+                x=simpledialog.askinteger('Frecuency to IIR', 'Put the Minimum Frecuency')
+            a=1
+            self.f_pbaja_iir.append(x)
+            self.f_altap_iir.append(x)
+            self.f_pbanda_iir.append(x)
+            self.f_rbanda_iir.append(x)
+
 
     def create_canvas(self,frame):
             canvas = Canvas(frame,width=600, height=100)
