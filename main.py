@@ -23,6 +23,8 @@ class Window(Frame):
         self.master = master
 
         self.respuesta = []
+        self.canal=0
+        self.frecuencias=[]
 
         # with that, we want to then run init_window, which doesn't yet exist
         self.init_window()
@@ -44,41 +46,75 @@ class Window(Frame):
 
     def create_tabs(self):
         nb = ttk.Notebook(self)
+        nb.grid(row=2, column=2, columnspan=400, rowspan=300, sticky='NESW')
 
-        nb.grid(row=1, column=1, columnspan=400, rowspan=300, sticky='NESW')
-
-        # Adds tab 1 of the notebook
+        # Adds tab 1 of the notebook contaminacio puro, conta gaussiano,submuestreo fs ,modula,amplitud 
         page1 = ttk.Frame(nb)
         nb.add(page1, text='ONE SIGNAL')
         nb.pack(expand=50,fill='both')
-        B = Button(page1, text ="PLAY",command=self.playAudio1)
+        B = Button(page1, text ="PLAY",command=self.playAudio1,bg="pale turquoise", fg="black")
         B.pack(side='left',fill='y')
-        Bd= Button(page1, text ="Graph",command=self.playAudio1)
+        Bd= Button(page1, text ="Graph",command=self.playAudio1,bg="pale turquoise", fg="black")
         Bd.pack(side='right',fill='y')
         self.create_canvas(page1)
+        B8 = Button(page1, text ="Pure Tone Noise",width=15, height=1,bg="linen", fg="black")
+        B8.place(x=60,y=3)
+        #B4.pack()
+        B9 = Button(page1, text ="Gaussian Noise", width=15, height=1, bg="linen", fg="black")
+        B9.place(x=210,y=3)
+        B0 = Button(page1, text ="Subsampling Fs", width=18, height=1, bg="linen", fg="black")
+        B0.place(x=360,y=3)
+        B10 = Button(page1, text ="Modulation", width=15, bg="linen", fg="black")
+        B10.place(x=530,y=3)
+        B11 = Button(page1, text ="Amplify", width=15, bg="linen", fg="black")
+        B11.place(x=660,y=3)
 
 
         # Adds tab 2 of the notebook
         page2 = ttk.Frame(nb)
         nb.add(page2, text='TWO SIGNAL')
         nb.pack(expand=50,fill='both')
-        B1 = Button(page2, text ="PLAY AUDIO 1",command=self.playAudio1)
+        B1 = Button(page2, text ="PLAY AUDIO 1",command=self.playAudio1,bg="pale turquoise", fg="black")
         B1.pack(side='left',fill='y')
-        B2 = Button(page2, text ="PLAY AUDIO 2",command=self.playAudio2)
+        B2 = Button(page2, text ="PLAY AUDIO 2",command=self.playAudio2,bg="pale turquoise", fg="black")
         B2.pack(side='right',fill='y')
 
+        B4 = Button(page2, text ="Signal 1 Time Domain",width=18, height=1,bg="linen", fg="black")
+        B4.place(x=105,y=3)
+        #B4.pack()
+        B5 = Button(page2, text ="Signal 1 Frecuency Domain", width=25, height=1, bg="linen", fg="black")
+        B5.place(x=250,y=3)
+        B6 = Button(page2, text ="Signal 2 Time Domain", width=18, height=1, bg="linen", fg="black")
+        B6.place(x=450,y=3)
+        B7 = Button(page2, text ="Signal 2 Frecuency Domain", width=25, bg="linen", fg="black")
+        B7.place(x=600,y=3)
+        B12 = Button(page2, text ="Addition", width=25, height=1, bg="lavender", fg="black")
+        B12.place(x=130,y=550)
+        B13 = Button(page2, text ="Substaction", width=18, height=1, bg="lavender", fg="black")
+        B13.place(x=390,y=550)
+        B14 = Button(page2, text ="Multiplication", width=25, bg="lavender", fg="black")
+        B14.place(x=600,y=550)
+       
+
+        #adds tab 3 of the notebook
         page3 = ttk.Frame(nb)
         nb.add(page3, text='FILTERS')
         nb.pack(expand=50,fill='both')
-
-        B3 = Button(page3, text ="SELECT_CHANNEL",command=self.ask)
+        B3 = Button(page3, text ="SELECT_CHANNEL",command=self.ask, bg="pale turquoise", fg="black")
         B3.pack(side='left',fill='y')
+        B15 = Button(page3, text ="SELECT_5 Frecuencies to Noise",command=self.frec_noise, bg="pale turquoise", fg="black")
+        B15.pack(side='right',fill='y')
+
     
     def ask(self):
         #0 es Izquierdo y 1 es Derecho
         a=simpledialog.askinteger('Select the Channel', 'Select the Channel, 0 is for Left and 1 for Right')
+        self.canal=a
 
-
+    def frec_noise(self):
+        for i in range(5):
+            a=simpledialog.askinteger('Frecuency to Noise', 'Put the Frecuency '+ str(i+1))
+            self.frecuencias.append(a)
 
     def create_canvas(self,frame):
             canvas = Canvas(frame,width=600, height=100)
