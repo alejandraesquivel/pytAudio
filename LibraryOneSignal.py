@@ -56,7 +56,7 @@ def modulacionAudio(path):
     f = 3 * Fs
     name = 'modulacion.wav'
     n = np.arange(len(x))
-    mod = (1 + 0.5 * x) * np.cos(2 *  np.pi * f * n)
+    mod=np.multiply(np.multiply(1.5,y),np.cos(np.multiply(2*np.pi*f,n)))
     writeAudio(name,mod,f)
 
 def writeAudio(name,suma,Fs):
