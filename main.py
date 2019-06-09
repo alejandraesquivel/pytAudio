@@ -54,7 +54,7 @@ class Window(Frame):
         B.pack(side='left',fill='y')
         Bd= Button(page1, text ="GRAPH",command=self.audio,bg="pale turquoise", fg="black")
         Bd.pack(side='right',fill='y')
-        self.create_canvas(page1)
+
         B8 = Button(page1, text ="Pure Tone Noise",width=15, height=1,bg="linen", fg="black")
         B8.place(x=60,y=3)
         #B4.pack()
@@ -101,6 +101,7 @@ class Window(Frame):
         B3.pack(side='left',fill='y')
         B15 = Button(page3, text ="SELECT_5 Frecuencies to Noise",command=self.frec_noise, bg="pale turquoise", fg="black")
         B15.pack(side='right',fill='y')
+        
 
 
     def ask(self):
@@ -108,10 +109,44 @@ class Window(Frame):
         a=simpledialog.askinteger('Select the Channel', 'Select the Channel, 0 is for Left and 1 for Right')
         self.canal=a
 
+
+    # Agrega un par de campos en el frame principal
+    def makeform(self, fields):
+        entries = {}
+        for field in fields:
+            print(field)
+            row = Frame(self)
+            lab = Label(row, width=22, text=field + ": ", anchor='w')
+            ent = Entry(row)
+            ent.insert(0, "0")
+            row.pack(side=TOP, fill=X, padx=5,pady=5)
+            lab.pack(side=LEFT)
+            ent.pack(side=RIGHT,
+                     expand=YES,
+                     fill=X)
+            entries[field] = ent
+        return entries
+
     def frec_noise(self):
         for i in range(5):
             a=simpledialog.askinteger('Frecuency to Noise', 'Put the Frecuency '+ str(i+1))
             self.frecuencias.append(a)
+
+    ## Ventana Emergente con fondo amarillo
+    def win2(self):
+
+        tl = Toplevel(self, bg="Orange")
+        tl.title("Modificar Datos")
+        tl.geometry('600x400')
+        tl.focus_set()
+        tl.grab_set()
+        tl.transient(master=self)
+
+        inf = StringVar(tl)
+        entry1 = Entry(tl, textvariable=inf)
+        entry1.grid(row=0, column=1)
+        label1 = Label(tl, text='Hija', bg="red")
+        label1.grid(row=0, column=0)
 
     def create_canvas(self,frame):
         canvas = Canvas(frame,width=50, height=50)
