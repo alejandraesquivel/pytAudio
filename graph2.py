@@ -107,7 +107,7 @@ fig_x_r, fig_y_r = 300,620
 fig_photo_r = draw_figure(canvas, fig_resul, loc=(fig_x_r, fig_y_r))
 fig_w_r, fig_h_r = fig_photo_r.width(), fig_photo_r.height()
 
-# Add more elements to the canvas, potentially on top of the figure
+# Add more elements to the canvas,   potentially on top of the figure
 canvas.create_text(450,600, text="Grafica Resultado de Operaciones", anchor="s")
 #menu de audios
 var=tk.StringVar(window)
