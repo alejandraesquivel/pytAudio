@@ -9,6 +9,7 @@ import numpy as np
 import subprocess
 import librosa
 import os
+from scipy import signal
 
 # Here, we are creating our class, Window, and inheriting from the Frame
 # class. Frame is a class from the tkinter module. (see Lib/tkinter/__init__)
@@ -37,6 +38,7 @@ class Window(Frame):
         self.f_altap_iir=[]
         self.f_pbanda_iir=[]
         self.f_rbanda_iir=[]
+        self.cutoff=0
 
         # with that, we want to then run init_window, which doesn't yet exist
         self.init_window()
@@ -122,7 +124,7 @@ class Window(Frame):
         B17 = Button(page3, text ="IIR",command=self.pedir_frec_iir, bg="pale turquoise", fg="black")
         B17.pack(side='top',fill='y')
 
-        B1 = Button(page3, text="Low Pass FIR", bg="linen", fg="black")
+        B1 = Button(page3, text="Low Pass FIR", bg="linen", fg="black", command=self.low_pass_filter)
         B1.place(x=130, y=550)
         B2 = Button(page3, text="High Pass FIR", bg="linen", fg="black")
         B2.place(x=300, y=550)
@@ -130,6 +132,15 @@ class Window(Frame):
         B3.place(x=480, y=550)
         B4 = Button(page3, text="Split Band FIR", bg="linen", fg="black")
         B4.place(x=650, y=550)
+
+        b1 = Button(page3, text="Low Pass FIR with Hamming", bg="linen", fg="black",command=self.lp_fir_Hamming)
+        b1.place(x=110, y=650)
+        b2 = Button(page3, text="High Pass FIR with Hamming", bg="linen", fg="black")
+        b2.place(x=285, y=650)
+        b3 = Button(page3, text="Pass Band FIR with Hamming", bg="linen", fg="black")
+        b3.place(x=460, y=650)
+        b4 = Button(page3, text="Split Band FIR with Hamming", bg="linen", fg="black")
+        b4.place(x=633, y=650)
 
         B1 = Button(page3, text="Low Pass IIR", bg="linen", fg="black")
         B1.place(x=130, y=450)
@@ -140,10 +151,24 @@ class Window(Frame):
         B4 = Button(page3, text="Split Band IIR", bg="linen", fg="black")
         B4.place(x=650, y=450)
 
+        b11 = Button(page3, text="Low Pass IIR with Hamming", bg="linen", fg="black")
+        b11.place(x=110, y=750)
+        b21 = Button(page3, text="High Pass IIR with Hamming", bg="linen", fg="black")
+        b21.place(x=285, y=750)
+        b31 = Button(page3, text="Pass Band IIR with Hamming", bg="linen", fg="black")
+        b31.place(x=460, y=750)
+        b41 = Button(page3, text="Split Band IIR with Hamming", bg="linen", fg="black")
+        b41.place(x=633, y=750)
+
     def ask(self):
         #0 es Izquierdo y 1 es Derecho
         a=simpledialog.askinteger('Select the Channel', 'Select the Channel, 0 is for Left and 1 for Right')
         self.canal=a
+
+    def ask_float(self):
+        #selecciona un flotante que es coeficiente entre 0 y 1
+        a=simpledialog.askfloat('Cut off', 'Put a float between 0 and 1')
+        self.cutoff=a
 
     def ask1(self):
         a=simpledialog.askinteger('Value Fs', 'Select Fs:')
@@ -441,6 +466,10 @@ class Window(Frame):
         for x in xrange(tot - samples):
             a[samples + x] = 0.0
         return np.fft.irfft(a)
+
+    def lp_fir_Hamming(x,samples=20):
+        a= signal.firwin(samples, self.ask_float, width=None, window='hamming', pass_zero=True, scale=True, nyq=1.0 )
+        return a
 
 root = Tk()
 
