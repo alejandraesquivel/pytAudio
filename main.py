@@ -168,7 +168,7 @@ class Window(Frame):
     ## Ventana Emergente con fondo amarillo
     def win2(self):
 
-        tl = Toplevel(self, bg="Orange")
+        tl = Toplevel(self, bg="linen")
         tl.title("Input Frecuency Data")
         tl.geometry('600x400')
         tl.focus_set()
@@ -359,6 +359,14 @@ class Window(Frame):
         multiplicacion = audio[0] * channel2
         writeAudio(name,multiplicacion,Fs1)
         plotAudio(multiplicacion, audio[1])
+
+    def low_pass_filter(x, samples=20):
+        """ fft based brute force low pass filter """
+        a = np.fft.rfft(x)
+        tot = len(a)
+        for x in xrange(tot - samples):
+            a[samples + x] = 0.0
+        return np.fft.irfft(a)
 
 root = Tk()
 
