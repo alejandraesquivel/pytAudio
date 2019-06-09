@@ -22,12 +22,13 @@ class Window(Frame):
         # reference to the master widget, which is the tk window
         self.master = master
 
-        self.respuesta = []
+        self.respuesta=[]
         self.canal=0
         self.frecuencias=[]
         self.i=0
         self.amp=0
         self.modulacion=0
+        self.gauss=0
         self.f_pbaja_fir=[]
         self.f_altap_fir=[]
         self.f_pbanda_fir=[]
@@ -72,7 +73,7 @@ class Window(Frame):
         B8 = Button(page1, text ="Pure Tone Noise",command=self.conPuroAudio,width=15, height=1,bg="linen", fg="black")
         B8.place(x=60,y=3)
         #B4.pack()
-        B9 = Button(page1, text ="Gaussian Noise",command=self.conGaussAudio,width=15, height=1, bg="linen", fg="black")
+        B9 = Button(page1, text ="Gaussian Noise",command=self.ask4,width=15, height=1, bg="linen", fg="black")
         B9.place(x=210,y=3)
         B0 = Button(page1, text ="Subsampling Fs",command=self.ask1,width=18, height=1, bg="linen", fg="black")
         B0.place(x=360,y=3)
@@ -90,12 +91,12 @@ class Window(Frame):
         B2 = Button(page2, text ="PLAY AUDIO 2",command=self.playAudio2,bg="pale turquoise", fg="black")
         B2.pack(side='right',fill='y')
 
-        B4 = Button(page2, text ="Signal 1 Time Domain",width=18, height=1,bg="linen", fg="black")
+        B4 = Button(page2, text ="Signal 1 Time Domain",width=18,command=self.plotAudio1, height=1,bg="linen", fg="black")
         B4.place(x=105,y=3)
         #B4.pack()
         B5 = Button(page2, text ="Signal 1 Frecuency Domain", width=25, height=1, bg="linen", fg="black")
         B5.place(x=250,y=3)
-        B6 = Button(page2, text ="Signal 2 Time Domain", width=18, height=1, bg="linen", fg="black")
+        B6 = Button(page2, text ="Signal 2 Time Domain",command=self.plotAudio1, width=18, height=1, bg="linen", fg="black")
         B6.place(x=450,y=3)
         B7 = Button(page2, text ="Signal 2 Frecuency Domain", width=25, bg="linen", fg="black")
         B7.place(x=600,y=3)
@@ -105,7 +106,6 @@ class Window(Frame):
         B13.place(x=390,y=550)
         B14 = Button(page2, text ="Multiplication", width=25,command=self.multiplicacion, bg="lavender", fg="black")
         B14.place(x=600,y=550)
-
 
         #adds tab 3 of the notebook
         page3 = ttk.Frame(nb)
@@ -159,6 +159,11 @@ class Window(Frame):
         a=simpledialog.askinteger('Value Fs', 'More than double:')
         self.modulacion=a
         self.modulacionAudio()
+
+    def ask4(self):
+        a=simpledialog.askinteger('Value Fs', 'More than double:')
+        self.gauss=a
+        self.conGaussAudio()
 
     def makeform(self, fields):
         entries = {}
@@ -246,7 +251,7 @@ class Window(Frame):
         my_filetypes = [('text files', '.wav')]
 
         # Ask the user to select a single file name.
-        answer_2= filedialog.askopenfilename(parent=self,
+        answer_2 = filedialog.askopenfilename(parent=self,
                                             initialdir=os.getcwd(),
                                             title="Please select a file:",
                                             filetypes=my_filetypes)
@@ -283,16 +288,23 @@ class Window(Frame):
         help_menu = Menu(menubar,tearoff = 0 )
         menubar.add_cascade(label="Help",menu=help_menu)
 
-    # Funciones Basicas para cargar y dibujar
+    # Funciones Basicas para cargar, dibujar y guardar audio
     def loadAudio(self):
         audio = self.respuesta[0]
         y, Fs = librosa.load(audio, mono=True)
-        return [y,Fs]
+        return (y,Fs)
+
+    def PlayAudioPath(self,ruta):
+        path=ruta
+        subprocess.call(['ffplay', '-nodisp', '-autoexit', path])
 
     def plotAudio(self,y,Fs):
         plt.figure(figsize=(14,5))
         librosa.display.waveplot(y, sr=Fs)
         plt.show()
+
+    def writeAudio(self,name,suma,Fs):
+        librosa.output.write_wav(name, suma, Fs)
 
     # Graficas para una sola señal
     def audio(self): #Audio Original
@@ -300,23 +312,33 @@ class Window(Frame):
         self.plotAudio(audio[0],audio[1])
 
     def conPuroAudio(self): #Audio con Ruido Puro
+        name='ruidoPuro.wav'
         audio = self.loadAudio()
         N = len(audio[0])
         f = 5
         x = np.arange(N)
-        noise = np.sin(2 * np.pi * f)
+        noise = np.sin(2 * np.pi * f) * x
         suma = audio[0] + noise
+        self.writeAudio(name,suma,audio[1])
+        self.PlayAudioPath(name)
         self.plotAudio(suma,audio[1])
 
+
     def conGaussAudio(self): #Audio con Gaussiano
+        name='gauss.wav'
         audio = self.loadAudio()
-        noise = np.random.normal(0,1,audio[0].shape)
+        noise = np.random.normal(0,self.gauss,audio[0].shape)
         gauss = audio[0] + noise
+        self.writeAudio(name,gauss,audio[1])
+        self.PlayAudioPath(name)
         self.plotAudio(gauss,audio[1])
 
     def submuestroAudio(self): #Audio con Submuestreo
+        name='submuestreo.wav'
         audio = self.loadAudio()
         Fsub = self.i #pasar submuestro
+        self.writeAudio(name,audio[0],Fsub)
+        self.PlayAudioPath(name)
         self.plotAudio(audio[0],Fsub)
 
     def amplificarAudio(self): #Audio Amplificado
@@ -324,15 +346,20 @@ class Window(Frame):
         audio = self.loadAudio()
         A = self.amp
         amplificar = A * audio[0]
+        self.writeAudio(name,amplificar,audio[1])
+        self.PlayAudioPath(name)
         self.plotAudio(amplificar,audio[1])
 
     def modulacionAudio(self): #Audio Modulacion
+        name='modulacion.wav'
         audio = self.loadAudio()
         channel = audio[0]
         f = audio[1] * self.modulacion * 3
         N = len(channel)
         n = np.arange(N)
         mod = np.multiply(np.multiply(1.5,channel),np.cos(np.multiply(2*np.pi*f,n)))
+        self.writeAudio(name,mod,f)
+        self.PlayAudioPath(name)
         self.plotAudio(mod,f)
 
     # Funciones para dos señales
@@ -347,7 +374,19 @@ class Window(Frame):
         y, Fs = librosa.load(audio, mono=True)
         return [y,Fs]
 
+    def plotAudio1(self): #Audio 1 en el Dominio del Tiempo
+        audio = self.loadAudio()
+        self.plotAudio(audio[0], audio[1])
+
+    def plotAudio2(self): #Audio 2 en el Dominio del Tiempo
+        audio = self.audio2()
+        self.plotAudio(audio[0], audio[1])
+
+    def plotAudioF1(self): #Audio 1 en el Dominio de la Frecuencia
+        audio = self.loadAudio()
+
     def suma(self): #Suma dos señales mono
+        name='suma.wav'
         audio = self.loadAudio()
         audio2 = self.audio2()
         N = len(audio[0])
@@ -358,12 +397,14 @@ class Window(Frame):
         else:
             channel2 = audio[0][:M]
             suma = audio2[0] + channel2
+        self.writeAudio(name,suma,audio[1])
+        self.PlayAudioPath(name)
         self.plotAudio(suma, audio[1])
 
     def resta(self): #Resta de dos señales mono
         audio = self.loadAudio()
         audio2 = self.audio2()
-        name = 'resta.wav'
+        name='resta.wav'
         N = len(audio[0])
         M = len(audio2[0])
         if M > N:
@@ -372,11 +413,12 @@ class Window(Frame):
         else:
             channel2 = audio[0][:M]
             resta = audio2[0] - channel2
-
-        #writeAudio(name,resta,Fs1)
+        self.writeAudio(name,resta,audio[1])
+        self.PlayAudioPath(name)
         self.plotAudio(resta, audio[1])
 
     def multiplicacion(self): #Multiplicación de dos señales mono
+        name='multipliacion'
         audio = self.loadAudio()
         audio2 = self.audio2()
         N = len(audio[0])
@@ -387,11 +429,11 @@ class Window(Frame):
         else:
             channel2 = audio[0][:M]
             multiplicacion = audio2[0] * channel2
-        name = 'multiplicacion.wav'
-
-        #writeAudio(name,multiplicacion,Fs1)
+        self.writeAudio(name,multipliacion,audio[1])
+        self.PlayAudioPath(name)
         self.plotAudio(multiplicacion, audio[1])
 
+    #Funciones para los Filtros
     def low_pass_filter(x, samples=20):
         """ fft based brute force low pass filter """
         a = np.fft.rfft(x)
