@@ -61,7 +61,7 @@ class Window(Frame):
         B.pack(side='left',fill='y')
         Bd= Button(page1, text ="GRAPH",command=self.audio,bg="pale turquoise", fg="black")
         Bd.pack(side='right',fill='y')
-        self.create_canvas(page1)
+       # self.create_canvas(page1)
         B8 = Button(page1, text ="Pure Tone Noise",width=15, height=1,bg="linen", fg="black")
         B8.place(x=60,y=3)
         #B4.pack()
@@ -114,7 +114,6 @@ class Window(Frame):
         B17.pack(side='top',fill='y')
         self.ope_fir()
         self.ope_iir()
-
 
     def ask(self):
         #0 es Izquierdo y 1 es Derecho
@@ -320,7 +319,7 @@ class Window(Frame):
 
 root = Tk()
 
-root.geometry("700x600")
+root.geometry("900x600")
 
 # creation of an instance
 app = Window(root)
