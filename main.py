@@ -28,6 +28,14 @@ class Window(Frame):
         self.i=0
         self.amp=0
         self.modulacion=0
+        self.f_pbaja_fir=[]
+        self.f_altap_fir=[]
+        self.f_pbanda_fir=[]
+        self.f_rbanda_fir=[]
+        self.f_pbaja_iir=[]
+        self.f_altap_iir=[]
+        self.f_pbanda_iir=[]
+        self.f_rbanda_iir=[]
 
         # with that, we want to then run init_window, which doesn't yet exist
         self.init_window()
@@ -49,7 +57,10 @@ class Window(Frame):
         nb = ttk.Notebook(self)
         nb.grid(row=2, column=2, columnspan=400, rowspan=300, sticky='NESW')
 
-        # Adds tab 1 of the notebook contaminacio puro, conta gaussiano,submuestreo fs ,modula,amplitud
+        # Adds tab 1 of the notebook contaminacion puro,
+        # contaminacion gaussiano,submuestreo fs ,
+        # modula,amplitud de la onda
+        5
         page1 = ttk.Frame(nb)
         nb.add(page1, text='ONE SIGNAL')
         nb.pack(expand=50,fill='both')
@@ -105,6 +116,29 @@ class Window(Frame):
         B15 = Button(page3, text ="SELECT_5 Frecuencies to Noise",command=self.frec_noise, bg="pale turquoise", fg="black")
         B15.pack(side='right',fill='y')
 
+        B16 = Button(page3, text ="FIR",command=self.win2, bg="pale turquoise", fg="black")
+        B16.pack(side='top',fill='y')
+        B17 = Button(page3, text ="IIR",command=self.pedir_frec_iir, bg="pale turquoise", fg="black")
+        B17.pack(side='top',fill='y')
+
+        B1 = Button(page3, text="Low Pass FIR", bg="linen", fg="black")
+        B1.place(x=130, y=550)
+        B2 = Button(page3, text="High Pass FIR", bg="linen", fg="black")
+        B2.place(x=300, y=550)
+        B3 = Button(page3, text="Pass Band FIR", bg="linen", fg="black")
+        B3.place(x=480, y=550)
+        B4 = Button(page3, text="Split Band FIR", bg="linen", fg="black")
+        B4.place(x=650, y=550)
+
+        B1 = Button(page3, text="Low Pass IIR", bg="linen", fg="black")
+        B1.place(x=130, y=450)
+        B2 = Button(page3, text="High Pass IIR", bg="linen", fg="black")
+        B2.place(x=300, y=450)
+        B3 = Button(page3, text="Pass Band IIR", bg="linen", fg="black")
+        B3.place(x=480, y=450)
+        B4 = Button(page3, text="Split Band IIR", bg="linen", fg="black")
+        B4.place(x=650, y=450)
+
 
     def ask(self):
         #0 es Izquierdo y 1 es Derecho
@@ -126,10 +160,77 @@ class Window(Frame):
         self.modulacion=a
         self.modulacionAudio()
 
+    def makeform(self, fields):
+        entries = {}
+        for field in fields:
+            print(field)
+            row = Frame(self)
+            lab = Label(row, width=22, text=field + ": ", anchor='w')
+            ent = Entry(row)
+            ent.insert(0, "0")
+            row.pack(side=TOP, fill=X, padx=5,pady=5)
+            lab.pack(side=LEFT)
+            ent.pack(side=RIGHT,
+                     expand=YES,
+                     fill=X)
+            entries[field] = ent
+        return entries
+
     def frec_noise(self):
         for i in range(5):
             a=simpledialog.askinteger('Frecuency to Noise', 'Put the Frecuency '+ str(i+1))
             self.frecuencias.append(a)
+
+
+    ## Ventana Emergente con fondo amarillo
+    def win2(self):
+
+        tl = Toplevel(self, bg="linen")
+        tl.title("Input Frecuency Data")
+        tl.geometry('600x400')
+        tl.focus_set()
+        tl.grab_set()
+        tl.transient(master=self)
+
+        inf = IntVar(tl)
+        entry1 = Entry(tl, textvariable=inf)
+        entry1.grid(row=0, column=1)
+        label1 = Label(tl, text='minimun frequency', bg="red")
+        label1.grid(row=0, column=0)
+
+        entry2 = Entry(tl, textvariable=inf)
+        entry2.grid(row=1, column=1)
+        label2 = Label(tl, text='maximun frequency', bg="red")
+        label2.grid(row=1, column=0)
+
+
+
+    def pedir_frec(self):
+        a=0
+        for i in range(2):
+            if a==0:
+                x=simpledialog.askinteger('Frecuency to FIR', 'Put the Maximum Frecuency')
+            else:
+                x=simpledialog.askinteger('Frecuency to FIR', 'Put the Minimum Frecuency')
+            a=1
+            self.f_pbaja_fir.append(x)
+            self.f_altap_fir.append(x)
+            self.f_pbanda_fir.append(x)
+            self.f_rbanda_fir.append(x)
+
+    def pedir_frec_iir(self):
+        a=0
+        for i in range(2):
+            if a==0:
+                x=simpledialog.askinteger('Frecuency to IIR', 'Put the Maximum Frecuency')
+            else:
+                x=simpledialog.askinteger('Frecuency to IIR', 'Put the Minimum Frecuency')
+            a=1
+            self.f_pbaja_iir.append(x)
+            self.f_altap_iir.append(x)
+            self.f_pbanda_iir.append(x)
+            self.f_rbanda_iir.append(x)
+
 
     def create_canvas(self,frame):
         canvas = Canvas(frame,width=50, height=50)
@@ -290,6 +391,14 @@ class Window(Frame):
 
         #writeAudio(name,multiplicacion,Fs1)
         self.plotAudio(multiplicacion, audio[1])
+
+    def low_pass_filter(x, samples=20):
+        """ fft based brute force low pass filter """
+        a = np.fft.rfft(x)
+        tot = len(a)
+        for x in xrange(tot - samples):
+            a[samples + x] = 0.0
+        return np.fft.irfft(a)
 
 root = Tk()
 
